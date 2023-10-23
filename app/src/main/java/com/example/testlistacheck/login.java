@@ -1,12 +1,17 @@
 package com.example.testlistacheck;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -77,11 +82,32 @@ public class login extends AppCompatActivity {
                         int codigo = jsonResponse.getInt("codigo");
                         String mensaje = jsonResponse.getString("mensaje");
 
-                        // Show the message using Toast on the UI thread
+                        // Show the message using Snackbar on the UI thread
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(login.this, mensaje, Toast.LENGTH_SHORT).show();
+                                Snackbar snackbar;
+                                switch (codigo) {
+                                    case 0:  // La cuenta no existe
+                                        snackbar = Snackbar.make(findViewById(android.R.id.content), mensaje, Snackbar.LENGTH_SHORT);
+                                        snackbar.setBackgroundTint(ContextCompat.getColor(login.this, android.R.color.holo_red_light));
+                                        break;
+                                    case 1:  // Cuenta verificada exitosamente
+                                        snackbar = Snackbar.make(findViewById(android.R.id.content), mensaje, Snackbar.LENGTH_SHORT);
+                                        snackbar.setBackgroundTint(ContextCompat.getColor(login.this, android.R.color.holo_green_light));
+                                        Intent intent = new Intent(login.this, MenuActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                        break;
+                                    case 2:  // Contraseña incorrecta
+                                        snackbar = Snackbar.make(findViewById(android.R.id.content), mensaje, Snackbar.LENGTH_SHORT);
+                                        snackbar.setBackgroundTint(ContextCompat.getColor(login.this, android.R.color.holo_orange_light));
+                                        break;
+                                    default:
+                                        snackbar = Snackbar.make(findViewById(android.R.id.content), mensaje, Snackbar.LENGTH_SHORT);
+                                        break;
+                                }
+                                snackbar.show();
                             }
                         });
                     }
@@ -91,5 +117,6 @@ public class login extends AppCompatActivity {
             }
         });
     }
+
 
 }
