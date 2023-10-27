@@ -68,7 +68,7 @@ public class login extends AppCompatActivity {
                     String json = String.format("{\"sol\": \"validateAccount\", \"account\": \"%s\", \"pass\": \"%s\"}", account, pass);
                     RequestBody body = RequestBody.create(json, JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbwYbRSIEwu4areW4uJy2W3wEIkt74JDiPQLmukFKvWXR-IxFby_Lq957COBGJANxnEr/exec")
+                            .url("https://script.google.com/macros/s/AKfycbx_1uayrbTajcQhIwFBSrMnijJB3gf5eRwHAAJ5loD1RUvfBuo5LI-s7I-k7bQPuSER/exec")
                             .post(body)
                             .build();
                     try (Response response = httpClient.newCall(request).execute()) {

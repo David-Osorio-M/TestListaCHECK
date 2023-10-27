@@ -14,7 +14,8 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void onImportExcelClick(View view) {
-        // Código para importar Excel
+        Intent intent = new Intent(MenuActivity.this, ImportExcelActivity.class);
+        startActivity(intent);
     }
 
     public void onRegisterEventClick(View view) {

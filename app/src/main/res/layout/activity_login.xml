@@ -21,13 +21,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Password Input -->
     <EditText
         android:id="@+id/input_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginTop="50dp"
         android:background="#e0f7fa"
         android:ems="10"
         android:hint="Name"
@@ -36,17 +37,17 @@
         android:textColor="#004d40"
         android:textColorHint="#004d40"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
 
-    <!-- Password Input -->
     <EditText
         android:id="@+id/input_pass"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginTop="16dp"
         android:background="#e0f7fa"
         android:ems="10"
         android:hint="Password"
@@ -55,6 +56,7 @@
         android:textColor="#004d40"
         android:textColorHint="#004d40"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_account" />
 
