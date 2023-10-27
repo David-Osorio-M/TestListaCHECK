@@ -1,28 +1,32 @@
 package com.example.testlistacheck;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class ImportExcelActivity extends AppCompatActivity {
 
-    private static final int PICK_EXCEL_FILE_REQUEST_CODE = 1;
     private EditText eventNameEditText;
-    private Uri excelFileUri;  // Variable para almacenar la URI del archivo Excel
+    private final OkHttpClient httpClient = new OkHttpClient();
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,62 +34,57 @@ public class ImportExcelActivity extends AppCompatActivity {
         setContentView(R.layout.activity_import_excel);
 
         eventNameEditText = findViewById(R.id.event_name_edit_text);
+        Button submitButton = findViewById(R.id.submit_button);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendCreateEventRequest();
+            }
+        });
     }
 
-    public void onAttachExcelClick(View view) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
-        startActivityForResult(intent, PICK_EXCEL_FILE_REQUEST_CODE);
-    }
+    private void sendCreateEventRequest() {
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyApp", Context.MODE_PRIVATE);
+                    String token = sharedPreferences.getString("Token", null);
+                    String eventName = eventNameEditText.getText().toString();
+                    String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
+                    String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Calendar.getInstance().getTime());
+                    String email = sharedPreferences.getString("Email", null);
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_EXCEL_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
-            excelFileUri = data.getData();  // Guarda la URI del archivo Excel
-        }
-    }
+                    JSONObject jsonRequest = new JSONObject();
+                    jsonRequest.put("solicitud", "crearEvento");
+                    jsonRequest.put("token", token);
+                    jsonRequest.put("nombreEvento", eventName);
+                    jsonRequest.put("fecha", currentDate);
+                    jsonRequest.put("hora", currentTime);
+                    jsonRequest.put("usuarioCreador", email);
 
-    private void downloadFile(String url) {
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setTitle("Descargando Plantilla");
-        request.setDescription("Descargando archivo Excel...");
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "plantilla.xlsx");
+                    RequestBody body = RequestBody.create(jsonRequest.toString(), JSON);
+                    Request request = new Request.Builder()
+                            .url("https://script.google.com/macros/s/AKfycbxM0bhZ8D7qF4y40yogvrFW5i49wCRfNzhJGQqaDK5Dmz0G1QKEpWow1UlWfzanAzorUQ/exec")
+                            .post(body)
+                            .build();
 
-        DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        downloadManager.enqueue(request);
-    }
+                    try (Response response = httpClient.newCall(request).execute()) {
+                        if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-    public void onDownloadTemplateClick(View view) {
-        String url = "https://docs.google.com/spreadsheets/d/1tjMFr7TSSgocUj_Q-PeRX1rypmwJ3W6b6UZYrsST7IE/export?format=xlsx";
-        downloadFile(url);
-    }
-
-    public void onCreateEventClick(View view) {
-        try {
-            // Obtener la información requerida
-            String eventName = eventNameEditText.getText().toString();
-            String excelFilePath = (excelFileUri != null) ? excelFileUri.toString() : null;
-            String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Calendar.getInstance().getTime());
-            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().getTime());
-
-            SharedPreferences sharedPreferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
-            String username = sharedPreferences.getString("username", null);
-
-            // Crear el objeto JSON
-            JSONObject eventInfo = new JSONObject();
-            eventInfo.put("nombreEvento", eventName);
-            eventInfo.put("archivoExcel", excelFilePath);
-            eventInfo.put("fecha", currentDate);
-            eventInfo.put("hora", currentTime);
-            eventInfo.put("usuario", username);
-
-            // Log the JSON object
-            Log.d("EventInfo", eventInfo.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(ImportExcelActivity.this, MenuActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

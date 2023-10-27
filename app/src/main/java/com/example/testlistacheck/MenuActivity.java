@@ -17,6 +17,11 @@ public class MenuActivity extends AppCompatActivity {
         Intent intent = new Intent(MenuActivity.this, ImportExcelActivity.class);
         startActivity(intent);
     }
+    public void onViewEventsClick(View view) {
+        Intent intent = new Intent(MenuActivity.this, ViewEventsActivity.class);
+        startActivity(intent);
+    }
+
 
     public void onRegisterEventClick(View view) {
         // Código para registrar evento
