@@ -66,7 +66,7 @@ public class login extends AppCompatActivity {
                     String json = String.format("{\"solicitud\": \"login\", \"correo\": \"%s\", \"pass\": %s}", account, pass);
                     RequestBody body = RequestBody.create(json, JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbxM0bhZ8D7qF4y40yogvrFW5i49wCRfNzhJGQqaDK5Dmz0G1QKEpWow1UlWfzanAzorUQ/exec")
+                            .url("https://script.google.com/macros/s/AKfycbzSYxY5ocJdt_A7Kmktm3VNTpLSIuyK6x9tbXJJg2nPK_D-wOoSz4mMbUXs3n86YxaP9Q/exec")
                             .post(body)
                             .build();
 
