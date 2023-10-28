@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -86,16 +87,22 @@ public class EventDetailActivity extends AppCompatActivity {
                             "{\"solicitud\": \"cambiarEstado\", \"token\": \"%s\", \"nombreEvento\": \"%s\", \"rutInvitado\": \"%s\"}",
                             token, eventName, rutInvitado
                     );
-
+                    Log.d("jasonBody", String.valueOf(json));
                     RequestBody body = RequestBody.create(json, JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbzSYxY5ocJdt_A7Kmktm3VNTpLSIuyK6x9tbXJJg2nPK_D-wOoSz4mMbUXs3n86YxaP9Q/exec")
+                            .url("https://script.google.com/macros/s/AKfycbzQZccaPJx0_IGCvpBWCp4LrM_EppNMEA7IzWcD15ZrTtuNyynRV63Gwi84i0YOsn0PWA/exec")
                             .post(body)
                             .build();
-
+                    Log.d("bodyyyyyy", String.valueOf(request));
+                    Log.d("token", String.valueOf(token));
+                    Log.d("eventName", String.valueOf(eventName));
+                    Log.d("rutInvitado", String.valueOf(rutInvitado));
+                    Log.d("body", String.valueOf(body));
                     try (Response response = httpClient.newCall(request).execute()) {
                         if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
+
+                        Log.d("response", String.valueOf(response));
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -125,7 +132,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
                     RequestBody body = RequestBody.create(json, JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbzSYxY5ocJdt_A7Kmktm3VNTpLSIuyK6x9tbXJJg2nPK_D-wOoSz4mMbUXs3n86YxaP9Q/exec")
+                            .url("https://script.google.com/macros/s/AKfycbzQZccaPJx0_IGCvpBWCp4LrM_EppNMEA7IzWcD15ZrTtuNyynRV63Gwi84i0YOsn0PWA/exec")
                             .post(body)
                             .build();
 

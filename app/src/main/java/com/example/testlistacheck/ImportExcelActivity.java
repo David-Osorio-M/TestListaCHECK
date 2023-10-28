@@ -65,7 +65,7 @@ public class ImportExcelActivity extends AppCompatActivity {
 
                     RequestBody body = RequestBody.create(jsonRequest.toString(), JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbxM0bhZ8D7qF4y40yogvrFW5i49wCRfNzhJGQqaDK5Dmz0G1QKEpWow1UlWfzanAzorUQ/exec")
+                            .url("https://script.google.com/macros/s/AKfycbzQZccaPJx0_IGCvpBWCp4LrM_EppNMEA7IzWcD15ZrTtuNyynRV63Gwi84i0YOsn0PWA/exec")
                             .post(body)
                             .build();
 
