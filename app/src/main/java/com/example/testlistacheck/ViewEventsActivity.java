@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,12 +21,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-
 public class ViewEventsActivity extends AppCompatActivity {
 
     private final OkHttpClient httpClient = new OkHttpClient();
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private LinearLayout eventsContainer;  // Referencia al contenedor de eventos
+    private LinearLayout eventsContainer;
     private ProgressBar progressBar;
 
     @Override
@@ -33,18 +33,21 @@ public class ViewEventsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_events);
 
-        eventsContainer = findViewById(R.id.events_container); // Inicializa el contenedor de eventos
+        eventsContainer = findViewById(R.id.events_container);
         progressBar = findViewById(R.id.progress_bar);
 
         fetchEvents();
     }
+
     public void onBackButtonClick(View view) {
         Intent intent = new Intent(ViewEventsActivity.this, MenuActivity.class);
         startActivity(intent);
         finish();
     }
+
     private void fetchEvents() {
         progressBar.setVisibility(View.VISIBLE);
+
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
@@ -68,36 +71,55 @@ public class ViewEventsActivity extends AppCompatActivity {
                         if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
                         String responseBody = response.body().string();
-                        Log.d("Response", responseBody);
-
                         JSONArray eventsArray = new JSONArray(responseBody);
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 progressBar.setVisibility(View.GONE);
+
                                 for (int i = 0; i < eventsArray.length(); i++) {
                                     try {
                                         JSONObject eventObject = eventsArray.getJSONObject(i);
                                         String nombreEvento = eventObject.getString("nombreEvento");
 
-                                        TextView eventTextView = new TextView(ViewEventsActivity.this);
-                                        eventTextView.setText(nombreEvento);
-                                        eventTextView.setTextSize(18);
-                                        eventTextView.setPadding(0, 0, 0, 16);  // Añade un padding inferior
+                                        View eventRow = getLayoutInflater().inflate(R.layout.event_row, null);
+                                        TextView eventName = eventRow.findViewById(R.id.event_name);
+                                        Button buttonView = eventRow.findViewById(R.id.button_view);
+                                        Button buttonAdd = eventRow.findViewById(R.id.button_add);
 
-                                        eventsContainer.addView(eventTextView);
+                                        eventName.setText(nombreEvento);
+
+                                        buttonView.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Intent intent = new Intent(ViewEventsActivity.this, EventDetailActivity.class);
+                                                intent.putExtra("eventName", nombreEvento);
+                                                startActivity(intent);
+                                            }
+                                        });
+
+
+
+                                        buttonAdd.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Intent intent = new Intent(ViewEventsActivity.this, AddPersonActivity.class);
+                                                intent.putExtra("eventName", nombreEvento);
+                                                startActivity(intent);
+                                            }
+                                        });
+
+                                        eventsContainer.addView(eventRow);
+
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
                                 }
                             }
                         });
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
                     }
-                } catch (Exception e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
