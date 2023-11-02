@@ -43,6 +43,11 @@ public class ImportExcelActivity extends AppCompatActivity {
         });
     }
 
+    public void onBackButtonClick(View view) {
+        Intent intent = new Intent(ImportExcelActivity.this, MenuActivity.class);
+        startActivity(intent);
+        finish();
+    }
     private void sendCreateEventRequest() {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override

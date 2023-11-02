@@ -5,7 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:background="@drawable/fondolistacheck"
     tools:context=".ImportExcelActivity">
+
+    <Button
+        android:id="@+id/button_back2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onBackButtonClick"
+        android:text="Volver" />
 
     <EditText
         android:id="@+id/event_name_edit_text"

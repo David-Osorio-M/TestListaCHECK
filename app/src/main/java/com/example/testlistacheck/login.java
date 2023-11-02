@@ -84,6 +84,7 @@ public class login extends AppCompatActivity {
                             @Override
                             public void run() {
                                 Snackbar snackbar;
+                                Log.d("bodyyyyyy", String.valueOf(request));
                                 if (!token.isEmpty()) {
                                     snackbar = Snackbar.make(findViewById(android.R.id.content), "Acceso Correcto", Snackbar.LENGTH_SHORT);
                                     snackbar.setBackgroundTint(ContextCompat.getColor(login.this, android.R.color.holo_green_light));

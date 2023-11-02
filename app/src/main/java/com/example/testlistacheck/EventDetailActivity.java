@@ -40,10 +40,19 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
         Button checkInButton = findViewById(R.id.button_check_in);
+
+        Button checkOutButton = findViewById(R.id.button_check_out);
         checkInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showCheckInDialog();
+            }
+        });
+
+        checkOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showCheckOutDialog();
             }
         });
 
@@ -60,6 +69,29 @@ public class EventDetailActivity extends AppCompatActivity {
         final EditText editTextRut = dialogView.findViewById(R.id.editTextRut);
 
         builder.setTitle("Check In")
+                .setPositiveButton("Ingresar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        String rutInvitado = editTextRut.getText().toString();
+                        sendCheckInRequest(rutInvitado);
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        builder.create().show();
+    }
+    private void showCheckOutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_check_in, null);
+        builder.setView(dialogView);
+
+        final EditText editTextRut = dialogView.findViewById(R.id.editTextRut);
+
+        builder.setTitle("Check Out")
                 .setPositiveButton("Ingresar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {

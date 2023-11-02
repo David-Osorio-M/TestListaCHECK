@@ -88,24 +88,31 @@ public class ViewEventsActivity extends AppCompatActivity {
                                         Button buttonView = eventRow.findViewById(R.id.button_view);
                                         Button buttonAdd = eventRow.findViewById(R.id.button_add);
 
-                                        eventName.setText(nombreEvento);
+                                        // Dividir nombreEvento en el guion bajo y tomar la primera parte para mostrar
+                                        String displayName = nombreEvento.split("_")[0];
+                                        eventName.setText(displayName);
+
+                                        // Establecer el nombreEvento completo como un tag en eventRow
+                                        eventRow.setTag(nombreEvento);
 
                                         buttonView.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
+                                                // Obtener el nombreEvento completo del tag en eventRow
+                                                String fullEventName = (String) eventRow.getTag();
                                                 Intent intent = new Intent(ViewEventsActivity.this, EventDetailActivity.class);
-                                                intent.putExtra("eventName", nombreEvento);
+                                                intent.putExtra("eventName", fullEventName);
                                                 startActivity(intent);
                                             }
                                         });
 
-
-
                                         buttonAdd.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
+                                                // Obtener el nombreEvento completo del tag en eventRow
+                                                String fullEventName = (String) eventRow.getTag();
                                                 Intent intent = new Intent(ViewEventsActivity.this, AddPersonActivity.class);
-                                                intent.putExtra("eventName", nombreEvento);
+                                                intent.putExtra("eventName", fullEventName);
                                                 startActivity(intent);
                                             }
                                         });
