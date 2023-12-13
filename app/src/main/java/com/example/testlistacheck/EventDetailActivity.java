@@ -18,7 +18,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.UUID;
 import java.util.concurrent.Executors;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -26,12 +31,28 @@ public class EventDetailActivity extends AppCompatActivity {
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     private String eventName;
 
+    BluetoothSocket bluetoothSocket;
+    OutputStream outputStream;
+
+    Button btnEnviarUno;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
 
         Button backButton = findViewById(R.id.button_back);
+
+         btnEnviarUno = findViewById(R.id.btnEnviarUno);
+
+        btnEnviarUno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                enviarDatos("1");
+            }
+        });
+
+        establecerConexionBluetooth();
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +79,39 @@ public class EventDetailActivity extends AppCompatActivity {
 
         eventName = getIntent().getStringExtra("eventName");
         fetchEventDetails(eventName);
+    }
+
+    private void establecerConexionBluetooth() {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothDevice device = bluetoothAdapter.getRemoteDevice("00:22:09:01:7B:64"); // Reemplaza con la dirección MAC de tu HC-05
+
+        try {
+            bluetoothSocket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+            bluetoothSocket.connect();
+            outputStream = bluetoothSocket.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void enviarDatos(String datos) {
+        try {
+            outputStream.write(datos.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bluetoothSocket != null) {
+            try {
+                bluetoothSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void showCheckInDialog() {
@@ -122,7 +176,7 @@ public class EventDetailActivity extends AppCompatActivity {
                     Log.d("jasonBody", String.valueOf(json));
                     RequestBody body = RequestBody.create(json, JSON);
                     Request request = new Request.Builder()
-                            .url("https://script.google.com/macros/s/AKfycbzQZccaPJx0_IGCvpBWCp4LrM_EppNMEA7IzWcD15ZrTtuNyynRV63Gwi84i0YOsn0PWA/exec")
+                            .url("https://script.google.com/macros/s/AKfycbwZXgLugt1cMYir7OTZ2tHfIQCW81LQByrw85zyGmeA5Xk1XdyZhw5xOmlnOVkYohdyCw/exe")
                             .post(body)
                             .build();
                     Log.d("bodyyyyyy", String.valueOf(request));
@@ -134,7 +188,10 @@ public class EventDetailActivity extends AppCompatActivity {
                         if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
 
-                        Log.d("response", String.valueOf(response));
+                        String responseString = response.body().string();
+                        Log.d("RESPUESTA", String.valueOf(responseString));
+                        String dataToSend = responseString.equals("1") ? "1" : "0";
+                        enviarDatos(dataToSend);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -143,6 +200,7 @@ public class EventDetailActivity extends AppCompatActivity {
                         });
                     }
                 } catch (IOException e) {
+                    enviarDatos("0");
                     e.printStackTrace();
                 }
             }
